@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>in.slashmark</groupId>
+  <artifactId>maven-suite</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>Slash Mark Maven Suite</name>
+  <description>Java Package Intelligence Suite: 25 real-time tools (sm-maven) for Maven builds on live data from Maven Central, OSV, CISA KEV, FIRST EPSS, deps.dev and GitHub.</description>
+  <url>https://github.com/slash-mark-dev/maven-suite</url>
+  <inceptionYear>2026</inceptionYear>
+
+  <organization>
+    <name>Slash Mark IT Solutions</name>
+    <url>https://slashmark.in</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>slash-mark-dev</id>
+      <name>Slash Mark IT Solutions</name>
+      <email>mukesh@slashmark.in</email>
+      <organization>Slash Mark IT Solutions</organization>
+      <organizationUrl>https://slashmark.in</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/slash-mark-dev/maven-suite</url>
+    <connection>scm:git:https://github.com/slash-mark-dev/maven-suite.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/slash-mark-dev/maven-suite.git</developerConnection>
+    <tag>v${project.version}</tag>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/slash-mark-dev/maven-suite/issues</url>
+  </issueManagement>
+
+  <properties>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.build.outputTimestamp>2026-10-25T00:00:00Z</project.build.outputTimestamp>
+    <!-- Tests are plain Java runners against local mock services; CI runs them with ./build.sh test. -->
+    <maven.test.skip>true</maven.test.skip>
+  </properties>
+
+  <!-- Zero runtime dependencies on purpose. -->
+
+  <build>
+    <finalName>sm-maven</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.14.0</version>
+        <configuration>
+          <compilerArgs>
+            <arg>-Xlint:all</arg>
+            <arg>-Xlint:-serial</arg>
+            <arg>-Werror</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>in.slashmark.maven.Main</mainClass>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+              <Implementation-Vendor>Slash Mark IT Solutions</Implementation-Vendor>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- mvn -P release deploy : sources, javadoc, GPG signatures and upload to the Central Portal. -->
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.3.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals><goal>jar-no-fork</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.11.2</version>
+            <configuration>
+              <doclint>none</doclint>
+              <quiet>true</quiet>
+              <failOnError>false</failOnError>
+            </configuration>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals><goal>jar</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.7</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals><goal>sign</goal></goals>
+                <configuration>
+                  <bestPractices>true</bestPractices>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.7.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+              <autoPublish>true</autoPublish>
+              <waitUntil>published</waitUntil>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

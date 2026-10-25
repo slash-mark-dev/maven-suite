@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# sm-maven launcher: runs sm-maven.jar from this folder or its parent (Java 17+ required).
+DIR=$(cd "$(dirname "$0")" && pwd)
+for j in "$DIR/sm-maven.jar" "$DIR/../sm-maven.jar" "$DIR/../build/sm-maven.jar"; do
+  if [ -f "$j" ]; then exec "${JAVA_HOME:+$JAVA_HOME/bin/}java" ${SM_MAVEN_JAVA_OPTS:-} -jar "$j" "$@"; fi
+done
+echo "sm-maven: sm-maven.jar not found next to $0" >&2
+exit 3

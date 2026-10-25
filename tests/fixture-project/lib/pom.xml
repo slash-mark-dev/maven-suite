@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.acme.shop</groupId>
+    <artifactId>shop-parent</artifactId>
+    <version>3.2.0</version>
+  </parent>
+  <artifactId>shop-lib</artifactId>
+  <name>Acme Shop Library</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>31.1-jre</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+      <version>5.3.17</version>
+    </dependency>
+    <dependency>
+      <groupId>com.acme</groupId>
+      <artifactId>acme-agent</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.example</groupId>
+      <artifactId>gpl-lib</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>2.17.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

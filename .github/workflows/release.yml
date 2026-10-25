@@ -1,0 +1,58 @@
+name: Release
+
+# Push a tag like v1.0.0 to publish in.slashmark:maven-suite to Maven Central and create a GitHub release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          server-id: central
+          server-username: CENTRAL_USERNAME
+          server-password: CENTRAL_TOKEN
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: GPG_PASSPHRASE
+
+      - name: Check the tag matches the POM version
+        run: |
+          POM_VERSION=$(mvn -B -q -ntp help:evaluate -Dexpression=project.version -DforceStdout)
+          test "v$POM_VERSION" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match pom.xml version $POM_VERSION"; exit 1; }
+
+      - name: Run all tests
+        run: ./build.sh test
+
+      - name: Publish to Maven Central
+        run: mvn -B -ntp -P release deploy
+        env:
+          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Package release files
+        run: |
+          mkdir -p dist/sm-maven/bin
+          cp target/sm-maven.jar dist/sm-maven/bin/sm-maven.jar
+          cp bin/sm-maven bin/sm-maven.cmd dist/sm-maven/bin/
+          cp README.md LICENSE CHANGELOG.md dist/sm-maven/
+          (cd dist && zip -qr "sm-maven-${GITHUB_REF_NAME#v}.zip" sm-maven)
+          cp target/sm-maven.jar "dist/sm-maven-${GITHUB_REF_NAME#v}.jar"
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.zip dist/*.jar \
+            --title "Maven Suite ${GITHUB_REF_NAME#v}" \
+            --notes "See [CHANGELOG.md](CHANGELOG.md). Maven Central: \`in.slashmark:maven-suite:${GITHUB_REF_NAME#v}\`"
